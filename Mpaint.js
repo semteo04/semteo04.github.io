@@ -3,8 +3,8 @@ let ctx = c.getContext("2d");
 function dboard() {
     ctx.beginPath();
     ctx.strokeStyle = "gray";
-    ctx.lineWidth = 5;
-    ctx.fillStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.fillStyle = "rgb(88, 88, 88)";
     for (let i = 1; i <= 8; i += 2) {
         for (let j = 1; j <= 8; j += 2) {
             ctx.rect(-50 + i * 70, -50 + j * 70, 70, 70);
