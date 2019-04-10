@@ -4,6 +4,8 @@
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="buttonCss.css">
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript">
+	</script>
 </head>
 <body onmousemove="buttonmove(event)" scroll="no">
 	<div id="center">
@@ -14,6 +16,10 @@
 	<button id="alertW" onclick="Wvis()">WRONG!</button>
 	<button id="blackW" onclick="Bwin()">BLACK WIN!</button>
 	<button id="whiteW" onclick="Wwin()">WHITE WIN!</button>
+	<button id="Q" onclick="Qu()">Q</button>
+	<button id="R" onclick="Ro()">R</button>
+	<button id="B" onclick="Bi()">B</button>
+	<button id="N" onclick="Ni()">N</button>
 	<script src="Mpaint.js"></script>
 	<script>
 		$( window ).resize(function() {
@@ -22,12 +28,16 @@
 		var pos=new Array(32),i,state,map=new Array(1000),player=1,rmW=0,rmB=0,rock,px,py,j,su=0;
 		var Cdis=document.getElementById("alertC"),Wdis=document.getElementById("alertW");
 		var Blwin=document.getElementById("blackW"),Whwin=document.getElementById("whiteW");
-		var move=new Array(32),judge=0,immove=new Array(32),winner=-1;
+		var move=new Array(32),judge=1,immove=new Array(32),winner=-1;
+		var rockState=new Array(32),imRockState=new Array(32);
+		var q=0,r=0,b=0,n=0;
 		for(i=0;i<1000;i++) {
 			map[i]=new Array(8);
 			for(j=0;j<8;j++) map[i][j]=[0,0,0,0,0,0,0,0];
 		}
 		for(i=0;i<32;i++){
+			rockState[i]=0;
+			imRockState[i]=0;
 			move[i]=0;
 			var x=document.createElement("div");
 			x.id="move"+(i+1);
@@ -65,6 +75,68 @@
 			}
 			map[su][pos[i+16].y][pos[i+16].x]=i+17;
 		}
+		function showState(){
+			if(player==0){
+				document.getElementById("submit").style.backgroundColor="black";
+				document.getElementById("submit").style.color="white";
+				document.getElementById("Q").style.backgroundColor="black";
+				document.getElementById("Q").style.color="white";
+				document.getElementById("R").style.backgroundColor="black";
+				document.getElementById("R").style.color="white";
+				document.getElementById("B").style.backgroundColor="black";
+				document.getElementById("B").style.color="white";
+				document.getElementById("N").style.backgroundColor="black";
+				document.getElementById("N").style.color="white";
+			}
+			else{
+				document.getElementById("submit").style.backgroundColor="white";
+				document.getElementById("submit").style.color="black";
+				document.getElementById("Q").style.backgroundColor="white";
+				document.getElementById("Q").style.color="black";
+				document.getElementById("R").style.backgroundColor="white";
+				document.getElementById("R").style.color="black";
+				document.getElementById("B").style.backgroundColor="white";
+				document.getElementById("B").style.color="black";
+				document.getElementById("N").style.backgroundColor="white";
+				document.getElementById("N").style.color="black";
+			}
+		}
+		function Qu(){
+			b=0; n=0; r=0;
+			q=1-q;
+			showState();
+			if(q==1){
+				document.getElementById("Q").style.backgroundColor='blue';
+				document.getElementById("Q").style.color='white';
+			}
+		}
+		function Bi(){
+			q=0; n=0; r=0;
+			b=1-b;
+			showState();
+			if(b==1){
+				document.getElementById("B").style.backgroundColor='blue';
+				document.getElementById("B").style.color='white';
+			}
+		}
+		function Ni(){
+			q=0; b=0; r=0;
+			n=1-n;
+			showState();
+			if(n==1){
+				document.getElementById("N").style.backgroundColor='blue';
+				document.getElementById("N").style.color='white';
+			}
+		}
+		function Ro(){
+			q=0; b=0; n=0;
+			r=1-r;
+			showState();
+			if(r==1){
+				document.getElementById("R").style.backgroundColor='blue';
+				document.getElementById("R").style.color='white';
+			}
+		}
 		function Cvis(){
 			Cdis.style.display="none";
 		}
@@ -97,6 +169,7 @@
 				rmW=0;
 				for(i=16;i<32;i++){if(pos[i].x<0) rmW++;}
 				for(i=0;i<32;i++) move[i]=immove[i];
+				for(i=0;i<32;i++) rockState[i]=imRockState[i];
 				Wdis.style.backgroundColor="rgba(255,0,0,0.5)";
 				Wdis.style.display="inline";
 				Cdis.style.display="none";
@@ -111,14 +184,7 @@
 				x.style.left=(pos[i].x*70+bx+22)+'px';
 				x.style.top=(pos[i].y*70+by+22)+'px';
 			}
-			if(player==0){
-				document.getElementById("submit").style.backgroundColor="black";
-				document.getElementById("submit").style.color="white";
-			}
-			else{
-				document.getElementById("submit").style.backgroundColor="white";
-				document.getElementById("submit").style.color="black";
-			}
+			showState();
 			if(winner==0) {
 				Whwin.style.backgroundColor="rgba(255,255,255,0.5)";
 				Whwin.style.display="inline";
@@ -128,6 +194,7 @@
 				Blwin.style.backgroundColor="rgba(0,0,0,0.5)";
 				Blwin.style.display="inline";
 			}
+			q=0;b=0;n=0;r=0;
 		}
 		document.body.style.height='100vh';
 		document.body.style.width='100vw';
@@ -141,7 +208,6 @@
 		}
 		function ten(x1,y1,x2,y2,st){
 			var i;
-			console.log(x1,y1,x2,y2);
 			for(i=x1+1;i<8;i++){
 				if(enemy(map[su][i][y1],st)==-1) break;
 				if(i==x2 && y1==y2) judge=1;
@@ -215,18 +281,17 @@
 		function OK(x1,y1,x2,y2,st){
 			var i;
 			judge=0;
+			for(i=0;i<32;i++) imRockState[i]=rockState[i];
 			if(rock==1){
 				if(st<=16){
 					if(x2==x1+1 && y2==y1 && map[su][x2][y2]==0) judge=1;
 					else if(move[st-1]==0 && x2==x1+2 && y2==y1 && map[su][x1+1][y1]==0 && map[su][x2][y2]==0) judge=1;
 					else if(x2==x1+1 && Math.abs(y2-y1)==1 && map[su][x2][y2]>16) judge=1;
-					else judge=0;
 				}
 				else {
 					if(x2==x1-1 && y2==y1 && map[su][x2][y2]==0) judge=1;
 					else if(move[st-1]==0 && x2==x1-2 && y2==y1 && map[su][x1-1][y1]==0 && map[su][x2][y2]==0) judge=1;
 					else if(x2==x1-1 && Math.abs(y2-y1)==1 && map[su][x2][y2]<=16 && map[su][x2][y2]!=0) judge=1;
-					else judge=0;
 				}
 			}
 			if(rock==2) ten(x1,y1,x2,y2,st);
@@ -234,6 +299,16 @@
 			if(rock==4) dia(x1,y1,x2,y2,st);
 			if(rock==5) {ten(x1,y1,x2,y2,st);dia(x1,y1,x2,y2,st);}
 			if(rock==6) king(x1,y1,x2,y2,st);
+			if(q+r+b+n==1){
+				if(rock!=1) judge=0;
+				if(st<=16 && rock==1 && pos[st-1].y!=7) judge=0;
+				if(st>16 && rock==1 && pos[st-1].y!=0) judge=0;
+				if(q==1) rockState[st-1]=5;
+				if(b==1) rockState[st-1]=4;
+				if(n==1) rockState[st-1]=3;
+				if(r==1) rockState[st-1]=2;
+				console.log(st>16 && rock==1 && pos[st-1].y!=0);
+			}
 		}
 		function buttoncheck(E){
 			if(state>0){
@@ -249,6 +324,7 @@
 				if(state==3 || state==6 || state==27 || state==30) rock=4;
 				if(state==4 || state==28) rock=5;
 				if(state==5 || state==29) rock=6;
+				if(rockState[state-1]!=0) rock=rockState[state-1];
 			}
 			else{
 				if(state==0) return;
@@ -293,7 +369,6 @@
 				else if(pos[28].x<0) {
 					if(judge==1) winner=1; else winner=-3;
 				}
-				console.log(pos[4],winner,judge);
 				Rpos();
 			}
 		}

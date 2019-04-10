@@ -106,3 +106,28 @@ input:hover{
 	color: white;
 	font-size: 100px;
 }
+#Q,#R,#B,#N{
+	position: fixed;
+	z-index: 10;
+	top: 50%;
+	left: 50%;
+	margin-top: -350px;
+	height: 70px;
+	border: 0px;
+	width: 70px;
+	color: white;
+	background-color: black;
+	font-size: 50px;
+}
+#Q{
+	margin-left: -140px;
+}
+#R{
+	margin-left: -70px;
+}
+#B{
+	margin-left: 0px;
+}
+#N{
+	margin-left: 70px;
+}
