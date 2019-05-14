@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="buttonCss.css">
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript">
+	</script>
+</head>
+<body onmousemove="buttonmove(event)" scroll="no">
+	<div id="center">
+		<canvas height="600px" width="600px" id="can"></canvas>
+	</div>
+	<input id="submit" type="button" value="check!!!" onclick="check()">
+	<button id="alertC" onclick="Cvis()">CORRECT!</button>
+	<button id="alertW" onclick="Wvis()">WRONG!</button>
+	<button id="blackW" onclick="Bwin()">BLACK WIN!</button>
+	<button id="whiteW" onclick="Wwin()">WHITE WIN!</button>
+	<button id="Q" onclick="Qu()">Q</button>
+	<button id="R" onclick="Ro()">R</button>
+	<button id="B" onclick="Bi()">B</button>
+	<button id="N" onclick="Ni()">N</button>
+	<script src="Mpaint.js"></script>
+	<script>
+		$( window ).resize(function() {
+			Rpos();
+		});
+		var pos=new Array(32),i,state,map=new Array(1000),player=1,rmW=0,rmB=0,rock,px,py,j,su=0;
+		var Cdis=document.getElementById("alertC"),Wdis=document.getElementById("alertW");
+		var Blwin=document.getElementById("blackW"),Whwin=document.getElementById("whiteW");
+		var move=new Array(32),judge=1,immove=new Array(32),winner=-1;
+		var rockState=new Array(32),imRockState=new Array(32);
+		var q=0,r=0,b=0,n=0;
+		for(i=0;i<1000;i++) {
+			map[i]=new Array(8);
+			for(j=0;j<8;j++) map[i][j]=[0,0,0,0,0,0,0,0];
+		}
+		for(i=0;i<32;i++){
+			rockState[i]=0;
+			imRockState[i]=0;
+			move[i]=0;
+			var x=document.createElement("div");
+			x.id="move"+(i+1);
+			x.style="position: absolute;top: 70px;left: 70px;";
+			var y=document.createElement("input");
+			y.type="button";
+			y.id="r"+(i+1);
+			if(i<16) y.style.backgroundImage="url('./phoneB.jpg')";
+			else y.style.backgroundImage="url('./phoneW.jpg')";
+			y.onmousedown=function(){
+				var x=this.id,y=0,j;
+				for(j=1;j<x.length;j++) {y*=10; y+=parseInt(x[j]);}
+				state=y;
+				buttoncheck(event);
+			}
+			y.onmouseup=function(){
+				var x=this.id,y=0,j;
+				state*=-1;
+				buttoncheck(event);
+			}
+			x.appendChild(y);
+			document.body.appendChild(x);
+		}
+		for(i=0;i<16;i++){
+			pos[i]={
+				x: i%8,
+				y: parseInt(i/8)
+			}
+			map[su][pos[i].y][pos[i].x]=i+1;
+		}
+		for(i=0;i<16;i++){
+			pos[i+16]={
+				x: i%8,
+				y: parseInt(i/8)+6
+			}
+			map[su][pos[i+16].y][pos[i+16].x]=i+17;
+		}
+		function showState(){
+			if(player==0){
+				document.getElementById("submit").style.backgroundColor="black";
+				document.getElementById("submit").style.color="white";
+				document.getElementById("Q").style.backgroundColor="black";
+				document.getElementById("Q").style.color="white";
+				document.getElementById("R").style.backgroundColor="black";
+				document.getElementById("R").style.color="white";
+				document.getElementById("B").style.backgroundColor="black";
+				document.getElementById("B").style.color="white";
+				document.getElementById("N").style.backgroundColor="black";
+				document.getElementById("N").style.color="white";
+			}
+			else{
+				document.getElementById("submit").style.backgroundColor="white";
+				document.getElementById("submit").style.color="black";
+				document.getElementById("Q").style.backgroundColor="white";
+				document.getElementById("Q").style.color="black";
+				document.getElementById("R").style.backgroundColor="white";
+				document.getElementById("R").style.color="black";
+				document.getElementById("B").style.backgroundColor="white";
+				document.getElementById("B").style.color="black";
+				document.getElementById("N").style.backgroundColor="white";
+				document.getElementById("N").style.color="black";
+			}
+		}
+		function Qu(){
+			b=0; n=0; r=0;
+			q=1-q;
+			showState();
+			if(q==1){
+				document.getElementById("Q").style.backgroundColor='blue';
+				document.getElementById("Q").style.color='white';
+			}
+		}
+		function Bi(){
+			q=0; n=0; r=0;
+			b=1-b;
+			showState();
+			if(b==1){
+				document.getElementById("B").style.backgroundColor='blue';
+				document.getElementById("B").style.color='white';
+			}
+		}
+		function Ni(){
+			q=0; b=0; r=0;
+			n=1-n;
+			showState();
+			if(n==1){
+				document.getElementById("N").style.backgroundColor='blue';
+				document.getElementById("N").style.color='white';
+			}
+		}
+		function Ro(){
+			q=0; b=0; n=0;
+			r=1-r;
+			showState();
+			if(r==1){
+				document.getElementById("R").style.backgroundColor='blue';
+				document.getElementById("R").style.color='white';
+			}
+		}
+		function Cvis(){
+			Cdis.style.display="none";
+		}
+		function Wvis(){
+			Wdis.style.display="none";
+		}
+		function Bwin(){
+			Blwin.style.display="none";
+		}
+		function Wwin(){
+			Whwin.style.display="none";
+		}
+		function check(){
+			var i,j;
+			if(judge==1) {
+				player=1-player;
+				Cdis.style.backgroundColor="rgba(0,255,0,0.5)";
+				Cdis.style.display="inline";
+				Wdis.style.display="none";
+			}
+			if(judge==0) {
+				su--;
+				for(i=0;i<8;i++){
+					for(j=0;j<8;j++){
+						if(map[su][i][j]!=0) {pos[map[su][i][j]-1].y=i;pos[map[su][i][j]-1].x=j;}
+					}
+				}
+				rmB=0;
+				for(i=0;i<16;i++){if(pos[i].x>=8) rmB++;}
+				rmW=0;
+				for(i=16;i<32;i++){if(pos[i].x<0) rmW++;}
+				for(i=0;i<32;i++) move[i]=immove[i];
+				for(i=0;i<32;i++) rockState[i]=imRockState[i];
+				Wdis.style.backgroundColor="rgba(255,0,0,0.5)";
+				Wdis.style.display="inline";
+				Cdis.style.display="none";
+			}
+			winner=-1;
+			Rpos();
+		}
+		function Rpos(){
+			var i,by=document.body.clientHeight/2-300,bx=document.body.clientWidth/2-300;
+			for(i=0;i<32;i++){
+				var x=document.getElementById('move'+(i+1));
+				x.style.left=(pos[i].x*70+bx+22)+'px';
+				x.style.top=(pos[i].y*70+by+22)+'px';
+			}
+			showState();
+			if(winner==0) {
+				Whwin.style.backgroundColor="rgba(255,255,255,0.5)";
+				Whwin.style.display="inline";
+				Whwin.style.color="black";
+			}
+			if(winner==1) {
+				Blwin.style.backgroundColor="rgba(0,0,0,0.5)";
+				Blwin.style.display="inline";
+			}
+			q=0;b=0;n=0;r=0;
+		}
+		document.body.style.height='100vh';
+		document.body.style.width='100vw';
+		Rpos();
+		var ch=0,mx,my,x;
+		function enemy(x,y){
+			if(x==0 || y==0) return 0;
+			if(x<=16 && y>16) return 1;
+			if(x>16 && y<=16) return 1;
+			return -1;
+		}
+		function ten(x1,y1,x2,y2,st){
+			var i;
+			for(i=x1+1;i<8;i++){
+				if(enemy(map[su][i][y1],st)==-1) break;
+				if(i==x2 && y1==y2) judge=1;
+				if(enemy(map[su][i][y1],st)==1) break;
+			}
+			for(i=x1-1;i>=0;i--){
+				if(enemy(map[su][i][y1],st)==-1) break;
+				if(i==x2 && y1==y2) judge=1;
+				if(enemy(map[su][i][y1],st)==1) break;
+			}
+			for(i=y1+1;i<8;i++){
+				if(enemy(map[su][x1][i],st)==-1) break;
+				if(x1==x2 && i==y2) judge=1;
+				if(enemy(map[su][x1][i],st)==1) break;
+			}
+			for(i=y1-1;i>=0;i--){
+				if(enemy(map[su][x1][i],st)==-1) break;
+				if(x1==x2 && i==y2) judge=1;
+				if(enemy(map[su][x1][i],st)==1) break;
+			}
+		}
+		function hourse(x1,y1,x2,y2,st){
+			var a=[0,1,2,2,1,-1,-2,-2,-1],b=[0,2,1,-1,-2,-2,-1,1,2],i;
+			for(i=1;i<=8;i++){
+				var sx=x1+a[i],sy=y1+b[i];
+				if(sx==x2 && sy==y2 && (enemy(map[su][x2][y2],st)==1 || enemy(map[su][x2][y2],st)==0)) judge=1;
+			}
+		}
+		function king(x1,y1,x2,y2,st){
+			var a=[0,1,1,1,0,-1,-1,-1,0],b=[0,-1,0,1,1,1,0,-1,-1],i;
+			for(i=1;i<=8;i++){
+				var sx=x1+a[i],sy=y1+b[i];
+				if(sx==x2 && sy==y2 && (enemy(map[su][x2][y2],st)==1 || enemy(map[su][x2][y2],st)==0)) judge=1;
+			}
+		}
+		function dia(x1,y1,x2,y2,st){
+			var sx,sy,i;
+			sx=x1; sy=y1;
+			for(i=1;i<=100;i++){
+				sx++; sy++;
+				if(sx<0 || sy<0 || sx>=8 || sy>=8) break;
+				if(enemy(map[su][sx][sy],st)==-1) break;
+				if(sx==x2 && sy==y2) judge=1;
+				if(enemy(map[su][sx][sy],st)==1) break;
+			}
+			sx=x1; sy=y1;
+			for(i=1;i<=100;i++){
+				sx++; sy--;
+				if(sx<0 || sy<0 || sx>=8 || sy>=8) break;
+				if(enemy(map[su][sx][sy],st)==-1) break;
+				if(sx==x2 && sy==y2) judge=1;
+				if(enemy(map[su][sx][sy],st)==1) break;
+			}
+			sx=x1; sy=y1;
+			for(i=1;i<=100;i++){
+				sx--; sy++;
+				if(sx<0 || sy<0 || sx>=8 || sy>=8) break;
+				if(enemy(map[su][sx][sy],st)==-1) break;
+				if(sx==x2 && sy==y2) judge=1;
+				if(enemy(map[su][sx][sy],st)==1) break;
+			}
+			sx=x1; sy=y1;
+			for(i=1;i<=100;i++){
+				sx--; sy--;
+				if(sx<0 || sy<0 || sx>=8 || sy>=8) break;
+				if(enemy(map[su][sx][sy],st)==-1) break;
+				if(sx==x2 && sy==y2) judge=1;
+				if(enemy(map[su][sx][sy],st)==1) break;
+			}
+		}
+		function OK(x1,y1,x2,y2,st){
+			var i;
+			judge=0;
+			for(i=0;i<32;i++) imRockState[i]=rockState[i];
+			if(rock==1){
+				if(st<=16){
+					if(x2==x1+1 && y2==y1 && map[su][x2][y2]==0) judge=1;
+					else if(move[st-1]==0 && x2==x1+2 && y2==y1 && map[su][x1+1][y1]==0 && map[su][x2][y2]==0) judge=1;
+					else if(x2==x1+1 && Math.abs(y2-y1)==1 && map[su][x2][y2]>16) judge=1;
+				}
+				else {
+					if(x2==x1-1 && y2==y1 && map[su][x2][y2]==0) judge=1;
+					else if(move[st-1]==0 && x2==x1-2 && y2==y1 && map[su][x1-1][y1]==0 && map[su][x2][y2]==0) judge=1;
+					else if(x2==x1-1 && Math.abs(y2-y1)==1 && map[su][x2][y2]<=16 && map[su][x2][y2]!=0) judge=1;
+				}
+			}
+			if(rock==2) ten(x1,y1,x2,y2,st);
+			if(rock==3) hourse(x1,y1,x2,y2,st);
+			if(rock==4) dia(x1,y1,x2,y2,st);
+			if(rock==5) {ten(x1,y1,x2,y2,st);dia(x1,y1,x2,y2,st);}
+			if(rock==6) king(x1,y1,x2,y2,st);
+			if(q+r+b+n==1){
+				if(rock!=1) judge=0;
+				if(st<=16 && rock==1 && pos[st-1].y!=7) judge=0;
+				if(st>16 && rock==1 && pos[st-1].y!=0) judge=0;
+				if(q==1) rockState[st-1]=5;
+				if(b==1) rockState[st-1]=4;
+				if(n==1) rockState[st-1]=3;
+				if(r==1) rockState[st-1]=2;
+				console.log(st>16 && rock==1 && pos[st-1].y!=0);
+			}
+		}
+		function buttoncheck(E){
+			if(state>0){
+				if(state>16 && player==0 || state<=16 && player==1) {state=0;return;}
+				if(pos[state-1].x==-1 || pos[state-1].x==8){state=0;return;}
+				x=document.getElementById('move'+state);
+				ch=state;
+				mx=E.clientX;
+				my=E.clientY;
+				if(state>8 && state<=24) rock=1;
+				if(state==1 || state==8 || state==25 || state==32) rock=2;
+				if(state==2 || state==7 || state==26 || state==31) rock=3;
+				if(state==3 || state==6 || state==27 || state==30) rock=4;
+				if(state==4 || state==28) rock=5;
+				if(state==5 || state==29) rock=6;
+				if(rockState[state-1]!=0) rock=rockState[state-1];
+			}
+			else{
+				if(state==0) return;
+				ch=0;
+				var i,by=document.body.clientHeight/2-300,bx=document.body.clientWidth/2-300,j;
+				px=pos[state*(-1)-1].x,py=pos[state*(-1)-1].y;
+				for(i=0;i<8;i++){
+					for(j=0;j<8;j++){
+						if(E.x>=(j*70+bx+20) && E.x<=((j+1)*70+bx+20) && E.y>=(i*70+by+20) && E.y<=((i+1)*70+by+20)) {pos[state*(-1)-1].x=j; pos[state*(-1)-1].y=i;};
+					}
+				}
+				if(map[su][pos[state*(-1)-1].y][pos[state*(-1)-1].x]!=0) {
+					if(map[su][pos[state*(-1)-1].y][pos[state*(-1)-1].x]>16 && player==1) {pos[state*(-1)-1].y=py;pos[state*(-1)-1].x=px;map[su][py][px]=state*-1;Rpos();return;}
+					if(map[su][pos[state*(-1)-1].y][pos[state*(-1)-1].x]<=16 && player==0) {pos[state*(-1)-1].y=py;pos[state*(-1)-1].x=px;map[su][py][px]=state*-1;Rpos();return;}
+					var rem=map[su][pos[state*(-1)-1].y][pos[state*(-1)-1].x]-1;
+					if(rem>=16){
+						rmW++;
+						if(rmW<=8) {pos[rem].x=-1; pos[rem].y=rmW-1;}
+						else {pos[rem].x=-2; pos[rem].y=rmW-9;}
+					}
+					if(rem<16){
+						rmB++;
+						if(rmB<=8) {pos[rem].x=8; pos[rem].y=8-rmB;}
+						else {pos[rem].x=9; pos[rem].y=16-rmB;}
+					}
+				}
+				su++;
+				var i,j;
+				for(i=0;i<8;i++){
+					for(j=0;j<8;j++) map[su][i][j]=map[su-1][i][j];
+				}
+				OK(py,px,pos[state*(-1)-1].y,pos[state*(-1)-1].x,state*-1);
+				for(i=0;i<32;i++) immove[i]=move[i];
+				move[state*(-1)-1]=1;
+				map[su][py][px]=0;
+				map[su][pos[state*(-1)-1].y][pos[state*(-1)-1].x]=state*(-1);
+				player=1-player;
+				if(winner<-1)winner=winner*(-1)-2;
+				else if(pos[4].x>=8) {
+					if(judge==1) winner=0; else winner=-2;
+				}
+				else if(pos[28].x<0) {
+					if(judge==1) winner=1; else winner=-3;
+				}
+				Rpos();
+			}
+		}
+		function buttonmove(E){
+			if(ch==0) return;
+			var i,z1=0,y1=x.style.top,y2=x.style.left,z2=0;
+			for(i=0;i<y1.length-2;i++){
+				z1*=10;
+				z1+=parseInt(y1[i]);
+			}
+			for(i=0;i<y2.length-2;i++){
+				z2*=10;
+				z2+=parseInt(y2[i]);
+			}
+			z1+=(E.clientY-my);
+			z2+=(E.clientX-mx);
+			mx=E.clientX;
+			my=E.clientY;
+			if(isNaN(z2)) z2=0;
+			if(isNaN(z1)) z1=0;
+			x.style.left=z2+"px";
+			x.style.top=z1+"px";
+		}
+	</script>
+</body>
+</html>

@@ -1,53 +1,29 @@
+var express = require('express');
+var app = express();
+var http = require('http').Server(app); //1
+var io = require('socket.io')(http);    //1
 
+app.get('/',function(req, res){  //2
+  res.sendFile(__dirname + '/client.html');
+});
 
-var http = require('http');
-var log=[],cnt=0;
-function speak(dd){
-    cnt++;
-    log[cnt]=dd;
-}
-function print(){
-    var st='',i;
-    for(i=1;i<=cnt;i++){
-        st=st+`console.log("${log[i]}");`
-    }
-    console.log(st);
-    return st;
-}
-function baseForm(){
-    return`
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-    <form method="post" onsubmit="return send()">
-        <input type="text" name="message">
-        <input type="submit">
-    </form>
-    <script type="text/javascript">
-        function send(){
-            return true;
-        }
-        ${print()}
-    </script>
-</body>
-</html>
-`
-}
-http.createServer(function (req, res){
-    if(req.method=='POST'){
-        req.on('data',(data)=>{
-            speak(data);
-            res.setHeader("Content-Type", "text/html");//req에 대한 res 전송
-            res.writeHead(200);//statusCode의 이유
-            res.end(baseForm());
-        });
-    }
-    else if(req.method=='GET'){
-        res.setHeader("Content-Type", "text/html");//req에 대한 res 전송
-        res.writeHead(200);//statusCode의 이유
-        res.end(baseForm());
-    }
-}).listen(8080);//서버 객체를 생성한 후 listen() 함수를 호출해 요청을 수신한다.
+var count=1;
+io.on('connection', function(socket){ //3
+  console.log('user connected: ', socket.id);  //3-1
+  var name = "user" + count++;                 //3-1
+  io.to(socket.id).emit('change name',name);   //3-1
+
+  socket.on('disconnect', function(){ //3-2
+    console.log('user disconnected: ', socket.id);
+  });
+
+  socket.on('send message', function(name,text){ //3-3
+    var msg = name + ' : ' + text;
+    console.log(msg);
+    io.emit('receive message', msg);
+  });
+});
+
+http.listen(3000, function(){ //4
+  console.log('server on!');
+});

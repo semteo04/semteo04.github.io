@@ -3,7 +3,7 @@ let ctx = c.getContext("2d");
 function dboard() {
     ctx.strokeStyle = "#666666";
     ctx.lineWidth = 1;
-    ctx.fillStyle = "#E0E0E0";
+    ctx.fillStyle = "white";
     for (let i = 1; i <= 8; i += 2) {
         for (let j = 1; j <= 8; j += 2) {
             ctx.beginPath(); 
@@ -22,7 +22,7 @@ function dboard() {
             ctx.closePath()
         }
     }
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#E0E0E0";
     for (let i = 2; i <= 8; i += 2) {
         for (let j = 1; j <= 8; j += 2) {
             ctx.beginPath();

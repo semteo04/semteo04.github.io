@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>indian</title>
+	<style type="text/css">
+		body{
+			background-color: brown;
+		}
+	</style>
+</head>
+<body>
+	<h1 id=eturn></h1>
+	<h1 id="enum">?</h1>
+	<h1 id="echip">?</h1>
+	<h1 id="ebat">?</h1>
+	<form id="bat">
+		<input type="text" name="chip" id="chip">
+		<input type="submit">
+	</form>
+	<h1 id="mybat">?</h1>
+	<h1 id="mychip">?</h1>
+	<h1 id="mynum">?</h1>
+	<h1 id=myturn></h1>
+	<script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+    	var socket = io();
+    	var mynum;
+    	socket.on('game start',function(){
+    		console.log("start");
+    	})
+    	socket.on('my num',function(val){
+    		mynum=val;
+    		console.log(mynum);
+    	})
+    	socket.on('your card',function(card){
+    		console.log('get');
+    		$('#enum').text("card : " + card);
+    	})
+    	socket.on('my chip',function(chip){
+    		$('#mychip').text("chip : "+chip);
+    	})
+    	socket.on('your chip',function(chip){
+    		$('#echip').text("chip : "+chip);
+    	})
+    	socket.on('my bat',function(bat){
+    		$('#mybat').text("bat : "+bat);
+    	})
+    	socket.on('your bat',function(bat){
+    		$('#ebat').text("bat : "+bat);
+    	})
+    	socket.on('turn',function(turn){
+    		if(turn==1){
+    			$('#eturn').text("_");
+    			$('#myturn').text("your turn");
+    		}
+    		else{
+    			$('#myturn').text("_");
+    			$('#eturn').text("your turn");
+    		}
+    	})
+    	$('#bat').on('submit', function(e){ //2\
+    		console.log($('#chip').val())
+        	socket.emit('bat', mynum, $('#chip').val());
+	        e.preventDefault();
+      	});
+    	/*
+      $('#chat').on('submit', function(e){ //2
+        socket.emit('send message', $('#name').val(), $('#message').val());
+        $('#message').val('');
+        $('#message').focus();
+        e.preventDefault();
+      });
+      socket.on('receive message', function(msg){ //3
+        $('#chatLog').append(msg+'\n');
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      });
+      socket.on('change name', function(name){ //4
+        $('#name').val(name);
+      });
+      */
+    </script>
+</body>
+</html>

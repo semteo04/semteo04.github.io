@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		html { overflow-y: hidden; }
+		#canvas{
+			margin: 0px;
+			border: 0px;
+			padding: 0px;
+		}
+		body{
+			margin : 0px;
+		}
+	</style>
+</head>
+<body onkeydown="kbDown(event)" onkeyup="kbUp(event)">
+	<canvas id='canvas'></canvas>
+	<script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+	<script type="text/javascript">
+		var socket=io();
+		var canvas=document.querySelector('canvas');
+		var kb=new Array(1000),num,x,y;
+		canvas.height=window.innerHeight;
+		canvas.width=window.innerWidth;
+		ctx=canvas.getContext('2d');
+		socket.on('my number',function(val){
+    		num=val;
+    	})
+    	socket.on('position',function(pos,count,pos1,count1,hp){
+    		ctx.beginPath();
+   			ctx.fillStyle="#00FF00";
+    		ctx.rect(0,0,2000,2000);
+    		ctx.fill();
+    		ctx.closePath();
+    		for(i=1;i<=count;i++){
+    			ctx.beginPath();
+    			ctx.arc(pos[i].x,pos[i].y,10,0,Math.PI*2);
+    			if(num==i) ctx.fillStyle="#000000"; else ctx.fillStyle="#FF0000";
+    			ctx.fill();
+				ctx.closePath();
+    		}
+    		for(i=1;i<=count1;i++){
+    			ctx.beginPath();
+    			ctx.arc(pos1[i].x,pos1[i].y,2,0,Math.PI*2);
+    			if(num==pos1[i].p) ctx.fillStyle="#000000"; else ctx.fillStyle="#FF0000";
+    			ctx.fill();
+				ctx.closePath();
+    		}
+    		ctx.beginPath();
+    		ctx.rect(window.innerWidth/2-103,window.innerHeight-83,206,36);
+    		ctx.fillStyle="#00000080";
+    		ctx.fill();
+    		ctx.closePath();
+    		ctx.beginPath();
+    		ctx.rect(window.innerWidth/2-100,window.innerHeight-80,hp*2,30);
+    		ctx.fillStyle="#FF000080";
+    		ctx.fill();
+    		ctx.closePath();
+    	})
+		function kbDown(event){
+			var keycode=event.keyCode;
+			kb[keycode]=1;
+		}
+		function kbUp(event){
+			var keycode=Number(event.keyCode);
+			kb[keycode]=0;
+		}
+		function render(){
+			socket.emit('keyboard', kb,num);
+		}
+		setInterval(function(){
+			render();
+		},1000/60);
+	</script>
+</body>
+</html>
