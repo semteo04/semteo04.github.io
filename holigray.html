@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			.container {
+				border: 5px solid black;
+			}
+			.container > * {
+				border: 5px solid red;
+			}
+			.container > .content > * {
+				border: 5px solid green;
+			}
+			.container .content {
+				padding-left: 200px;
+				padding-right: 150px;
+				overflow: hidden;
+			}
+			.container .content > * {
+				float: left;
+				padding-bottom: 2500px;
+				margin-bottom: -2500px;
+			}
+			.container .content main {
+				width: 100%;
+			}
+			.container .content nav {
+				width: 200px;
+				margin-left: -100%;
+				position: relative;
+				left: -200px;
+			}
+			.container .content aside {
+				width: 150px;
+				margin-right: -150px;
+			}
+			.container footer {
+				clear: both;
+			}
+			@media (max-width: 599px) {
+				.container .content {
+					padding-left: 0px;
+					padding-right: 0px;
+					overflow: visible;
+				}
+				.container .content > * {
+					float: none;
+					padding-bottom: 0px;
+					margin-bottom: 0px;
+				}
+				.container .content main {
+					width: 100%;
+				}
+				.container .content nav {
+					width: auto;
+					margin-left: 0;
+					position: relative;
+					left: 0px;
+				}
+				.container .content aside {
+					width: auto;
+					margin-right: 0px;
+				}
+				.container footer {
+					clear: both;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>HEADER</h1>
+			</header>
+			<section class="content">
+				<main>
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+					Autem facere itaque nisi ipsum voluptate alias, ea vitae
+					nemo, voluptas facilis sunt tenetur harum quos cumque unde
+					aut obcaecati atque modi nobis. Maxime molestias, veritatis
+					alias sapiente quo fugiat provident. Provident totam
+					asperiores laboriosam dignissimos, cupiditate, voluptatum
+					dolore nam repellat architecto minus consequuntur. Officiis
+					magni reprehenderi!
+				</main>
+				<nav>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+					<li>item</li>
+				</nav>
+				<aside>
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+					Autem facere itaque nisi ipsum voluptate alias, ea vitae
+					nemo, voluptas
+				</aside>
+			</section>
+			<footer>
+				<a href="https://semteo04.github.io/">FOOTER</a>
+			</footer>
+		</div>
+	</body>
+</html>

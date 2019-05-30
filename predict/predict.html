@@ -1,13 +1,138 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="buttonCss.css">
-</head>
-<body>
-	<div id="center">
-		<canvas height="600px" width="600px" id="can"></canvas>
-	</div>
-	<script src="Mpaint.js"></script>
-</body>
+	<head>
+		<title>predict</title>
+		<link rel="stylesheet" type="text/css" href="./css" />
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<div id="center">
+			<canvas height="600px" width="600px" id="can"></canvas>
+		</div>
+		<input id="in1" type="text" maxlength="1" />
+		<input id="in2" type="text" maxlength="1" />
+		<input id="in3" type="text" maxlength="1" />
+		<input id="in4" type="text" maxlength="1" />
+		<input id="in5" type="text" maxlength="1" />
+		<button id="send">send</button>
+		<script src="./predictMpaint"></script>
+		<script type="text/javascript">
+			var socket = io();
+			var id;
+			socket.on("my number", function(num) {
+				id = num;
+				console.log(id);
+			});
+			socket.on("admit", function() {
+				$("#send").css("background-color", "green");
+			});
+			socket.on("disadmit", function() {
+				$("#send").css("background-color", "rgb(221,221,221)");
+			});
+			socket.on("board", function(x, y) {
+				var i, j;
+				for (i = 0; i < 32; i++) {
+					button[i].x = -3;
+					button[i].y = -3;
+				}
+				for (i = 1; i <= 8; i++) {
+					for (j = 1; j <= 8; j++) {
+						if (x[i][j] != 0) {
+							button[x[i][j] - 1].stat = y[i][j];
+							button[x[i][j] - 1].x = i;
+							button[x[i][j] - 1].y = j;
+						}
+					}
+				}
+				for (i = 0; i < 32; i++) {
+					button[i].pos();
+				}
+			});
+			$(window).resize(function() {
+				for (var i = 0; i < 32; i++) button[i].pos();
+			});
+			$("#send").click(function(e) {
+				console.log($("#in1"));
+				socket.emit(
+					"move",
+					$("#in1").val(),
+					$("#in2").val(),
+					$("#in3").val(),
+					$("#in4").val(),
+					$("#in5").val()
+				);
+				console.log("1111");
+			});
+			class Rock {
+				constructor(html, x, y, i) {
+					this.html = $(html);
+					this.x = x;
+					this.y = y;
+					this.stat = 0;
+					this.key = i;
+				}
+				pos() {
+					this.html.css(
+						"top",
+						window.innerHeight / 2 + 70 * (this.x - 5) + 3
+					);
+					this.html.css(
+						"left",
+						window.innerWidth / 2 + 70 * (this.y - 5) + 3
+					);
+					var img;
+					if (this.stat == -1) img = "./predictPhoneW";
+					if (this.stat == 1) img = "./predictPhoneB";
+					if (this.stat == -4) img = "./predictBishopW";
+					if (this.stat == 4) img = "./predictBishopB";
+					if (this.stat == -2) img = "./predictRookW";
+					if (this.stat == 2) img = "./predictRookB";
+					if (this.stat == -3) img = "./predictKnightW";
+					if (this.stat == 3) img = "./predictKnightB";
+					if (this.stat == -5) img = "./predictQueenW";
+					if (this.stat == 5) img = "./predictQueenB";
+					if (this.stat == -6) img = "./predictKingW";
+					if (this.stat == 6) img = "./predictKingB";
+					this.html.css("background-image", `url(${img})`);
+				}
+			}
+			var button = new Array(32);
+			for (i = 0; i < 32; i++) {
+				var img;
+				button[i] = new Rock(
+					"<button></button>",
+					Math.floor(i / 8) + 1,
+					(i % 8) + 1,
+					i
+				);
+				if (i >= 8 && i < 24) button[i].stat = 1;
+				if (i == 2 || i == 5 || i == 26 || i == 29) button[i].stat = 4;
+				if (i == 0 || i == 7 || i == 24 || i == 31) button[i].stat = 2;
+				if (i == 1 || i == 6 || i == 25 || i == 30) button[i].stat = 3;
+				if (i == 3 || i == 27) button[i].stat = 5;
+				if (i == 4 || i == 28) button[i].stat = 6;
+				if (i >= 16) {
+					button[i].x = Math.floor(i / 8) + 5;
+					button[i].stat *= -1;
+				}
+				if (button[i].stat == -1) img = "./predictPhoneW";
+				if (button[i].stat == 1) img = "./predictPhoneB";
+				if (button[i].stat == -4) img = "./predictBishopW";
+				if (button[i].stat == 4) img = "./predictBishopB";
+				if (button[i].stat == -2) img = "./predictRookW";
+				if (button[i].stat == 2) img = "./predictRookB";
+				if (button[i].stat == -3) img = "./predictKnightW";
+				if (button[i].stat == 3) img = "./predictKnightB";
+				if (button[i].stat == -5) img = "./predictQueenW";
+				if (button[i].stat == 5) img = "./predictQueenB";
+				if (button[i].stat == -6) img = "./predictKingW";
+				if (button[i].stat == 6) img = "./predictKingB";
+				button[i].html.css("background-image", `url(${img})`);
+				$("body").append(button[i].html);
+				button[i].html.css("position", "absolute");
+				button[i].pos();
+			}
+		</script>
+	</body>
 </html>
