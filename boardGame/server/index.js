@@ -10,6 +10,9 @@ io.on('connection', (socket) => {
     socket.on('login', (userName) => {
         connection.query(`INSERT INTO userInfo (userid, time) VALUES ("${userName}", "${new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')}");`);
     });
+    socket.on('chat', (chat) => {
+        io.emit('chat',chat);
+    });
 });
 
 
@@ -24,6 +27,8 @@ const connection = mysql.createConnection({
     password: 'Qwrtjrwnsdl!2',
     database: 'boardGame',
     port: '3306'
+//    database: 'boardgame',
+//    port: '3307'
 })
 
 
