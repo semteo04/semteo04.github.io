@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="./reset.css">
     <link rel="stylesheet" type="text/css" href="./card.css">
+    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.4/socket.io.js"></script>
     <script type="text/javascript" src="./poker.js"></script>
     <title>포커</title>
@@ -23,5 +24,9 @@
     <div class="card c11"></div>
     <div class="card c12"></div>
     <div class="card c13"></div>
+    <input type="text" id="chat">
+    <button onclick="send()">보내기</button>
+    <ul id="chatting">
+    </ul>
 </body>
 </html>

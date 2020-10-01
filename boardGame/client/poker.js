@@ -1,6 +1,15 @@
-var wsUri = "ws://ec2-35-165-46-164.us-west-2.compute.amazonaws.com:3000";
-var output;
+let wsUri = "ws://ec2-35-165-46-164.us-west-2.compute.amazonaws.com:3000";
+//let wsUri = "ws://localhost:3000";
+let output;
 
-var socket = io(wsUri);
-
+let socket = io(wsUri);
 socket.on("hello",(data) => {console.log(data);});
+socket.on("chat",(data) => {
+    $('#chatting').append(`<li>${data}</li>`);
+});
+
+function send(){
+    let chat = document.getElementById("chat").value;
+    socket.emit("chat",chat);
+    console.log(chat);
+}
